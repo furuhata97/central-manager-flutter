@@ -2,12 +2,11 @@ import 'package:http/http.dart';
 import 'dart:async';
 import 'dart:convert';
 import '../../services/auth_service.dart';
-
-const BASE_URL = 'https://api.solumobi.com.br/v1/api/';
+import '../globals.dart';
 
 class WebClient {
   final AuthService _authService = AuthService();
-  
+
   Future<void> autentica(String login, String password) async {
     String basicAuth = 'Basic ${base64Encode(utf8.encode('$login:$password'))}';
     final response = await post(
@@ -25,22 +24,19 @@ class WebClient {
       _authService.storeToken(data['token'], data['refreshToken']);
     } else {
       // Se o servidor não retornar uma resposta "OK", lance um erro
-      throw Exception('Falha ao realizar login. Código de Status: ${response.statusCode}');
+      throw Exception(
+          'Falha ao realizar login. Código de Status: ${response.statusCode}');
     }
   }
 
   Future<bool> renovaToken(token, refreshToken, payload) async {
-    final response = await post(
-      Uri.parse("${BASE_URL}usuarios/atualiza_token"),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token'
-      },
-      body: jsonEncode({
-        'refreshToken': refreshToken,
-        'id_filial': payload["id_filial"]
-      })
-    );
+    final response = await post(Uri.parse("${BASE_URL}usuarios/atualiza_token"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(
+            {'refreshToken': refreshToken, 'id_filial': payload["id_filial"]}));
 
     if (response.statusCode == 200) {
       var data = json.decode(response.body);

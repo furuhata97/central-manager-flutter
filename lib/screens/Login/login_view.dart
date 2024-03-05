@@ -1,14 +1,15 @@
+import 'package:estudo/screens/home/home_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+//import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../components/error_view.dart';
 import '../../components/progress/progress_view.dart';
-import '../../globals.dart' as globals;
+//import '../../globals.dart' as globals;
 
-import '../auth_check/auth_check.dart';
+//import '../auth_check/auth_check.dart';
 import '../home/home_view.dart';
 import 'login_cubit.dart';
 
@@ -63,11 +64,46 @@ class _LoginViewState extends State<LoginView> {
   }
 
   void goToHomePage(BuildContext blocContext) async {
-    await Navigator.of(blocContext).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const Home(),
-      ),
-    );
+    // await Navigator.of(blocContext).pushReplacement(
+    //   MaterialPageRoute(
+    //     builder: (context) => const HomeContainer(),
+    //   ),
+    // );
+    Navigator.pushReplacementNamed(context, '/');
+  }
+
+  void loginButton(LoginCubit cubit) async {
+    if (_loginController.text.isEmpty) {
+      toastification.show(
+        context: context,
+        type: ToastificationType.error,
+        style: ToastificationStyle.fillColored,
+        title: const Text("Login vazio"),
+        description: const Text(
+            "O campo de login está vazio, preencha este campo para prosseguir"),
+        alignment: Alignment.topRight,
+        autoCloseDuration: const Duration(seconds: 5),
+        icon: const Icon(Icons.close),
+        showProgressBar: true,
+      );
+      return;
+    }
+    if (_passwordController.text.isEmpty) {
+      toastification.show(
+        context: context,
+        type: ToastificationType.error,
+        style: ToastificationStyle.fillColored,
+        title: const Text("Senha vazia"),
+        description: const Text(
+            "O campo de senha está vazio, preencha este campo para prosseguir"),
+        alignment: Alignment.topRight,
+        autoCloseDuration: const Duration(seconds: 5),
+        icon: const Icon(Icons.close),
+        showProgressBar: true,
+      );
+      return;
+    }
+    cubit.authenticateState(_loginController.text, _passwordController.text);
   }
 
   Scaffold buildLoginForm(BuildContext context, LoginCubit cubit) {
@@ -136,6 +172,9 @@ class _LoginViewState extends State<LoginView> {
                         obscureText: !_passwordVisible,
                         enableSuggestions: false,
                         autocorrect: false,
+                        onSubmitted: (value) {
+                          loginButton(cubit);
+                        },
                         decoration: InputDecoration(
                           enabledBorder: const OutlineInputBorder(
                             borderSide:
@@ -175,40 +214,7 @@ class _LoginViewState extends State<LoginView> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                         ),
-                        onPressed: () async {
-                          if (_loginController.text.isEmpty) {
-                            toastification.show(
-                              context: context,
-                              type: ToastificationType.error,
-                              style: ToastificationStyle.fillColored,
-                              title: const Text("Login vazio"),
-                              description: const Text(
-                                  "O campo de login está vazio, preencha este campo para prosseguir"),
-                              alignment: Alignment.topRight,
-                              autoCloseDuration: const Duration(seconds: 5),
-                              icon: const Icon(Icons.close),
-                              showProgressBar: true,
-                            );
-                            return;
-                          }
-                          if (_passwordController.text.isEmpty) {
-                            toastification.show(
-                              context: context,
-                              type: ToastificationType.error,
-                              style: ToastificationStyle.fillColored,
-                              title: const Text("Senha vazia"),
-                              description: const Text(
-                                  "O campo de senha está vazio, preencha este campo para prosseguir"),
-                              alignment: Alignment.topRight,
-                              autoCloseDuration: const Duration(seconds: 5),
-                              icon: const Icon(Icons.close),
-                              showProgressBar: true,
-                            );
-                            return;
-                          }
-                          cubit.authenticateState(
-                              _loginController.text, _passwordController.text);
-                        },
+                        onPressed: (() => loginButton(cubit)),
                         child: const Text(
                           'ENTRAR',
                           style: TextStyle(color: Colors.white, fontSize: 14),

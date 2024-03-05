@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class ProgressView extends StatelessWidget {
   final String message;
 
-  const ProgressView({this.message = "Sending..."});
+  const ProgressView({super.key, this.message = "Sending..."});
 
   @override
   Widget build(BuildContext context) {

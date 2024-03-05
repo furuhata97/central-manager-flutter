@@ -1,12 +1,16 @@
 import 'package:estudo/screens/Login/login_container.dart';
+import 'package:estudo/screens/home/home_container.dart';
 import 'package:estudo/screens/home/home_view.dart';
 import 'package:flutter/material.dart';
+import 'dart:html' as html;
 
 import '../../components/progress/progress_view.dart';
 import '../../services/auth_service.dart';
 
 class AuthCheck extends StatefulWidget {
-  const AuthCheck({super.key});
+  final Widget child;
+  final String routeName;
+  const AuthCheck({super.key, required this.child, required this.routeName});
 
   @override
   State<AuthCheck> createState() => _AuthCheckState();
@@ -15,7 +19,8 @@ class AuthCheck extends StatefulWidget {
 class _AuthCheckState extends State<AuthCheck> {
   final AuthService _authService = AuthService();
   bool carregando = false;
-  String tela = "login";
+  bool isLoggedIn = true;
+  String? token;
 
   @override
   void initState() {
@@ -50,14 +55,14 @@ class _AuthCheckState extends State<AuthCheck> {
 
   void _navigateToLogin() {
     setState(() {
-      tela = "login";
+      isLoggedIn = false;
       carregando = false;
     });
   }
 
   void _navigateToHome() {
     setState(() {
-      tela = "home";
+      isLoggedIn = true;
       carregando = false;
     });
   }
@@ -67,9 +72,12 @@ class _AuthCheckState extends State<AuthCheck> {
     if (carregando) {
       return const ProgressView(message: 'Verificando login...');
     } else {
-      if (tela == "home") {
-        return const Home();
+      if (isLoggedIn) {
+        //Navigator.pushReplacementNamed(context, widget.routeName, builder: (context) => widget.child);
+        html.window.history.pushState(null, widget.routeName, widget.routeName);
+        return widget.child;
       } else {
+        html.window.history.pushState(null, 'login', '/login');
         return const LoginContainer();
       }
     }

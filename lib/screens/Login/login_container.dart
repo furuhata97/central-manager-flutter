@@ -12,7 +12,7 @@ class LoginContainer extends BlocContainer {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => LoginCubit(),
-      child: LoginView(),
+      child: const LoginView(),
     );
   }
 }

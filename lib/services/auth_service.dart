@@ -1,7 +1,7 @@
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../http/httpClient.dart';
+import '../http/loginAPI.dart';
 
 class AuthService {
   Future<void> storeToken(String token, String refreshToken) async {
@@ -18,11 +18,7 @@ class AuthService {
 
   Future<String?> getToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = await prefs.getString('app-token');
-    if (token != null) {
-      Map<String, dynamic> payload = JwtDecoder.decode(token ?? "");
-      print("As informações do token são ${payload}");
-    }
+    String? token = prefs.getString('app-token');
     return token;
   }
 
@@ -42,7 +38,7 @@ class AuthService {
     String? token = prefs.getString('app-token');
     String? refreshToken = prefs.getString('refresh-token');
     if (token != null && refreshToken != null) {
-      Map<String, dynamic> payload = JwtDecoder.decode(token ?? "");
+      Map<String, dynamic> payload = JwtDecoder.decode(token);
       return webClient.renovaToken(token, refreshToken, payload);
     } else {
       return false;
