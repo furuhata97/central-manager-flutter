@@ -11,7 +11,8 @@ abstract class HomeState {
 
 @immutable
 class ShowHomeState extends HomeState {
-  const ShowHomeState();
+  final List<dynamic>? clientes;
+  const ShowHomeState(this.clientes);
 }
 
 @immutable
@@ -29,7 +30,7 @@ class FatalErrorHomeState extends HomeState {
 class HomeCubit extends Cubit<HomeState> {
   final ClientAPI webClient = ClientAPI();
 
-  HomeCubit() : super(const ShowHomeState());
+  HomeCubit() : super(const ShowHomeState(null));
 
   void getDadosAPI() async {
     emit(const LoadingState());
@@ -40,9 +41,15 @@ class HomeCubit extends Cubit<HomeState> {
       filial = resposta;
 
       var resposta2 = await webClient.getEmpresa();
-      print("A resposta da requisição2 é $resposta");
+      print("A resposta da requisição2 é $resposta2");
       empresa = resposta2;
-      emit(const ShowHomeState());
+
+      var resposta3 = await webClient.getClientes();
+      //print("A resposta da requisição3 é $resposta3");
+      //empresa = resposta2;
+      //print(resposta3.runtimeType);
+
+      emit(ShowHomeState(resposta3));
     } catch (e) {
       emit(FatalErrorHomeState(e.toString()));
     }
